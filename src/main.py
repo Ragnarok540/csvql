@@ -2,11 +2,12 @@ from csvrw import CSVRW
 from db import DB
 
 def main():
-    csvrw = CSVRW('../data/csv_data.csv', ',', '"')
-    list = csvrw.read()
-    #print(list)
+    csvrw = CSVRW('../data/csv_data.csv' , ',') 
+    listt = csvrw.read()
     db = DB('../data/cars.db')
-    db.create_table('baz', ['foo', 'bar'], ['int', 'text']);
+    columns = db.columns(listt)
+    types = db.types(listt)
+    print(db.create_table('CARS', columns, types))
 
 if __name__ == '__main__':
     

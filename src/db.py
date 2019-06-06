@@ -25,8 +25,7 @@ class DB:
         columns_types = list(map(lambda x: ' '.join(list(x)), columns_types))
         statement.append(', '.join(columns_types))
         statement.append(")")
-        print(' '.join(statement))
-        #self.query_db(' '.join(statement))
+        return ' '.join(statement)
 
     def type_value(self, value):
         if value == "":
@@ -45,16 +44,14 @@ class DB:
         integer = False
         real = False
         text = False
-
         for row in table:
             type_c = self.type_value(row[column])
-            if type_c == 'INTEGER':
+            if type_c == "INTEGER":
                 integer = True
-            elif type_c == 'REAL':
+            elif type_c == "REAL":
                 real = True
-            elif type_c == 'TEXT':
+            elif type_c == "TEXT":
                 text = True
-
         if text == True:
             return "TEXT"
         if real == True:
@@ -76,3 +73,27 @@ class DB:
         for column in header:
             columns.append(column)
         return columns
+
+    def bulk_insert(self, name, table):
+        table.pop(0) # header
+        statement = []
+        statement.append("INSERT INTO")
+        statement.append(name)
+        statement.append("VALUES")
+        counter = 0
+        for row in table:
+            statement.append("(")
+            for column in range(0, len(table[0])):
+                type_c = self.type_value(row[column])
+                if type_c == "NULL":
+                    statement.append("NULL")
+                else:
+                    statement.append(f"'{row[column]}'")
+                if column < (len(table[0]) - 1):
+                    statement.append(",")
+            statement.append(")")
+            if counter < (len(table) - 1):
+                statement.append(",")
+            counter = counter + 1
+        statement.append(";")
+        return ' '.join(statement)

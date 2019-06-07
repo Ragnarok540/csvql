@@ -97,3 +97,6 @@ class DB:
             counter = counter + 1
         statement.append(";")
         return ' '.join(statement)
+
+    def drop_table(self, name):
+        return f"DROP TABLE IF EXISTS {name};"

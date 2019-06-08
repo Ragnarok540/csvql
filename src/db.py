@@ -24,8 +24,9 @@ class DB:
         columns_types = list(zip(columns, types))
         columns_types = list(map(lambda x: ' '.join(list(x)), columns_types))
         statement.append(', '.join(columns_types))
-        statement.append(")")
-        return ' '.join(statement)
+        statement.append(");")
+        sql = ' '.join(statement)
+        self.query_db(sql)
 
     def type_value(self, value):
         if value == "":
@@ -96,7 +97,23 @@ class DB:
                 statement.append(",")
             counter = counter + 1
         statement.append(";")
-        return ' '.join(statement)
+        sql = ' '.join(statement)
+        self.query_db(sql)
 
     def drop_table(self, name):
-        return f"DROP TABLE IF EXISTS {name};"
+        sql = f"DROP TABLE IF EXISTS {name}"
+        self.query_db(sql)
+
+    def print_table(self, table):
+        print(table[0].keys())
+        for row in table:
+            print(list(row))
+
+    def print_sql(self, name):
+        sql = """
+              SELECT sql
+                FROM sqlite_master
+               WHERE name = ?
+              """
+        result = self.query_db(sql, args=(name,), one=True)
+        print(list(result)[0])

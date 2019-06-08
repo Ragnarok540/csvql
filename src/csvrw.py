@@ -16,5 +16,6 @@ class CSVRW:
     def write(self, table):
         with open(self.path, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile, delimiter=self.delimiter)
+            writer.writerow(table[0].keys()) # header
             for row in table:
-                writer.writerow(row) # needs work
+                writer.writerow(row)

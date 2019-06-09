@@ -21,11 +21,11 @@ class DB:
         statement.append("CREATE TABLE")
         statement.append(name)
         statement.append("(")
-        columns_types = list(zip(columns, types))
-        columns_types = list(map(lambda x: ' '.join(list(x)), columns_types))
-        statement.append(', '.join(columns_types))
+        col_types = list(zip(columns, types))
+        col_types = list(map(lambda x: " ".join(list(x)), col_types))
+        statement.append(", ".join(col_types))
         statement.append(");")
-        sql = ' '.join(statement)
+        sql = " ".join(statement)
         self.query_db(sql)
 
     def type_value(self, value):
@@ -61,8 +61,9 @@ class DB:
             return "INTEGER"
         return "TEXT"
 
-    def types(self, table):
-        table.pop(0) # header
+    def types(self, table, header=True):
+        if header == True:
+            table.pop(0)
         types = []
         for column in range(0, len(table[0])):
             types.append(self.type_column(table, column))
@@ -75,8 +76,9 @@ class DB:
             columns.append(column)
         return columns
 
-    def bulk_insert(self, name, table):
-        table.pop(0) # header
+    def bulk_insert(self, name, table, header=True):
+        if header == True:
+            table.pop(0)
         statement = []
         statement.append("INSERT INTO")
         statement.append(name)
@@ -97,17 +99,22 @@ class DB:
                 statement.append(",")
             counter = counter + 1
         statement.append(";")
-        sql = ' '.join(statement)
+        sql = " ".join(statement)
         self.query_db(sql)
 
     def drop_table(self, name):
         sql = f"DROP TABLE IF EXISTS {name}"
         self.query_db(sql)
 
-    def print_table(self, table):
-        print(table[0].keys())
+    def print_table(self, table, header=True, maxr=20):
+        if header == True:
+            print(table[0].keys())
+        counter = 0
         for row in table:
             print(list(row))
+            counter = counter + 1
+            if counter > maxr:
+                break;
 
     def print_sql(self, name):
         sql = """
@@ -117,3 +124,13 @@ class DB:
               """
         result = self.query_db(sql, args=(name,), one=True)
         print(list(result)[0])
+
+    def print_tables(self):
+        sql = """
+              SELECT name
+                FROM sqlite_master
+               WHERE type = ?
+              """
+        result = self.query_db(sql, args=("table",)) #, one=True)
+        result_t = list(map(lambda x: " ".join(list(x)), result))
+        print(" ".join(result_t))

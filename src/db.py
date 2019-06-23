@@ -1,4 +1,4 @@
-import sqlite3
+import sys, sqlite3
 
 class DB:
     def __init__(self, path):
@@ -106,14 +106,20 @@ class DB:
         sql = f"DROP TABLE IF EXISTS {name}"
         self.query_db(sql)
 
-    def print_table(self, table, header=True, maxr=20):
+    def print_table(self, table, header=True, maxr=sys.maxsize):
         if header == True:
-            print(table[0].keys())
+            try:
+                print(table[0].keys())
+            except:
+                raise
         counter = 0
         for row in table:
-            print(list(row))
+            try:
+                print(list(row))
+            except:
+                raise
             counter = counter + 1
-            if counter > maxr:
+            if counter >= maxr:
                 break;
 
     def print_sql(self, name):
@@ -131,6 +137,6 @@ class DB:
                 FROM sqlite_master
                WHERE type = ?
               """
-        result = self.query_db(sql, args=("table",)) #, one=True)
+        result = self.query_db(sql, args=("table",))
         result_t = list(map(lambda x: " ".join(list(x)), result))
         print(" ".join(result_t))

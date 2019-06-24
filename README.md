@@ -5,7 +5,7 @@ work with CSV files
 csvql has no requirements or dependencies other than Python 3
 
 # Features
-- Load one or more CSV files into an embedded database as tables
+- Load one or more CSV files into an SQLite database as tables
 - Query and modify the data using SQL
 - Create new CSV files from the results of SQL queries
 
@@ -14,9 +14,9 @@ csvql has no requirements or dependencies other than Python 3
 You can install, upgrade, and uninstall ``csvql.py`` with these commands:
 
 ```sh
-  $ pip install csvql
-  $ pip install --upgrade csvql
-  $ pip uninstall csvql
+  $ pip3 install csvql
+  $ pip3 install --upgrade csvql
+  $ pip3 uninstall csvql
 ```
 
 ## Help

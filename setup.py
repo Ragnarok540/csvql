@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="csvql",
-    version="0.0.4",
+    version="0.0.3",
     author="Edgar Nova",
     author_email="ragnarok540@gmail.com",
     description="csvql command line tool",

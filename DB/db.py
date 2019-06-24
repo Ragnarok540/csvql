@@ -1,4 +1,6 @@
-import sys, sqlite3
+import sys
+import sqlite3
+
 
 class DB:
     def __init__(self, path):
@@ -34,11 +36,11 @@ class DB:
         try:
             int(value)
             return "INTEGER"
-        except:
+        except ValueError:
             try:
                 float(value)
                 return "REAL"
-            except:
+            except ValueError:
                 return "TEXT"
 
     def type_column(self, table, column):
@@ -53,16 +55,16 @@ class DB:
                 real = True
             elif type_c == "TEXT":
                 text = True
-        if text == True:
+        if text:
             return "TEXT"
-        if real == True:
+        if real:
             return "REAL"
-        if integer == True:
+        if integer:
             return "INTEGER"
         return "TEXT"
 
     def types(self, table, header=True):
-        if header == True:
+        if header:
             table.pop(0)
         types = []
         for column in range(0, len(table[0])):
@@ -82,8 +84,6 @@ class DB:
         return columns
 
     def bulk_insert(self, name, table, header=True):
-        #if header == False:
-        #    table.pop(0)
         statement = []
         statement.append("INSERT INTO")
         statement.append(name)
@@ -112,20 +112,20 @@ class DB:
         self.query_db(sql)
 
     def print_table(self, table, header=True, maxr=sys.maxsize):
-        if header == True:
+        if header:
             try:
                 print(table[0].keys())
-            except:
+            except Exception:
                 raise
         counter = 0
         for row in table:
             try:
                 print(list(row))
-            except:
+            except Exception:
                 raise
             counter = counter + 1
             if counter >= maxr:
-                break;
+                break
 
     def print_sql(self, name):
         sql = """

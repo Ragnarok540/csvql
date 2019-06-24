@@ -69,16 +69,21 @@ class DB:
             types.append(self.type_column(table, column))
         return types
 
-    def columns(self, table):
+    def columns(self, table, file_header=True):
         columns = []
         header = table[0]
+        counter = 0
         for column in header:
-            columns.append(column)
+            if file_header:
+                columns.append(column)
+            else:
+                columns.append(f"col_{counter}")
+                counter = counter + 1
         return columns
 
     def bulk_insert(self, name, table, header=True):
-        if header == True:
-            table.pop(0)
+        #if header == False:
+        #    table.pop(0)
         statement = []
         statement.append("INSERT INTO")
         statement.append(name)
@@ -140,3 +145,7 @@ class DB:
         result = self.query_db(sql, args=("table",))
         result_t = list(map(lambda x: " ".join(list(x)), result))
         print(" ".join(result_t))
+
+    def read_sql(self, path):
+        file = open(path)
+        return file.read()

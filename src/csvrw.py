@@ -5,11 +5,15 @@ class CSVRW:
         self.path = path
         self.delimiter = delimiter
 
-    def read(self):
+    def read(self, ignore=0):
         ls = []
         with open(self.path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=self.delimiter)
+            counter = 0
             for row in reader:
+                if counter < ignore:
+                    counter = counter + 1
+                    continue
                 ls.append(row)
         return ls
 

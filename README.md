@@ -2,6 +2,8 @@
 csvql is an easy to use, open source command line tool to
 work with CSV files
 
+csvql has no requirements or dependencies other than Python 3
+
 # Features
 - Load one or more CSV files into an embedded database as tables
 - Query and modify the data using SQL
@@ -12,9 +14,9 @@ work with CSV files
 You can install, upgrade, and uninstall ``csvql.py`` with these commands:
 
 ```sh
-  $ pip install pycodestyle
-  $ pip install --upgrade pycodestyle
-  $ pip uninstall pycodestyle
+  $ pip install csvql
+  $ pip install --upgrade csvql
+  $ pip uninstall csvql
 ```
 
 ## Help

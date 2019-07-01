@@ -1,7 +1,8 @@
-import sys
 import argparse
 import csv
+import json
 import sqlite3
+import sys
 
 
 class CSVRW:
@@ -179,7 +180,7 @@ class DB:
         return file.read()
 
 
-def exe(args):
+def _exec(args):
     db = DB(args.connect)
     sql = args.sql_query
     if args.sql_file:
@@ -189,14 +190,36 @@ def exe(args):
     db.close()
 
 
-def desc(args):
+def _export(args):
+    db = DB(args.connect)
+    sql = args.sql_query
+    if args.sql_file:
+        sql = db.read_sql(args.sql_file)
+    print(f"executing: '{sql}'") if args.verbose else None
+    result = db.query_db(sql)
+    db.close()
+    if args.format == "csv":
+        csvrw = CSVRW(args.file_name, args.delimiter)
+        csvrw.write(result, args.header)
+    elif args.format == "json":
+        list = []
+        for item in result:
+            list.append(dict(zip(item.keys(), item)))
+        with open(args.file_name, 'w') as json_file:
+            json.dump(list, json_file, indent=2)
+    if args.verbose:
+        print(f"'{args.file_name}' created")
+        print(f"'{len(result)}' rows written")
+
+
+def _desc(args):
     db = DB(args.connect)
     for table in args.table_name:
         db.print_sql(table)
     db.close()
 
 
-def drop(args):
+def _drop(args):
     db = DB(args.connect)
     for table in args.table_name:
         db.drop_table(table)
@@ -204,8 +227,9 @@ def drop(args):
     db.close()
 
 
-def load(args):
+def _import(args):
     csvrw = CSVRW(args.file_name, args.delimiter)
+    print(f"reading '{args.file_name}'") if args.verbose else None
     csv = csvrw.read(args.ignore)
     db = DB(args.connect)
     columns = db.columns(csv, args.header)
@@ -217,12 +241,12 @@ def load(args):
         print(f"""{len(csv)} rows inserted into {args.table_name}""")
 
 
-def query(args):
+def _query(args):
     db = DB(args.connect)
     sql = args.sql_query
     if args.sql_file:
         sql = db.read_sql(args.sql_file)
-    print(f"executing: '{sql}'") if args.verbose else None
+    print(f"executing: '{sql}'\n") if args.verbose else None
     result = db.query_db(sql)
     if args.all:
         db.print_table(result, header=args.header)
@@ -237,22 +261,10 @@ def query(args):
     db.close()
 
 
-def tables(args):
+def _tables(args):
     db = DB(args.connect)
     db.print_tables()
     db.close()
-
-
-def unload(args):
-    db = DB(args.connect)
-    sql = args.sql_query
-    if args.sql_file:
-        sql = db.read_sql(args.sql_file)
-    print(f"executing: '{sql}'") if args.verbose else None
-    result = db.query_db(sql)
-    db.close()
-    csvrw = CSVRW(args.file_name, args.delimiter)
-    csvrw.write(result, args.header)
 
 
 parent_parser = argparse.ArgumentParser(add_help=False)
@@ -269,8 +281,8 @@ parent_parser.add_argument("-H", "--header", action="store_false",
                                    CSV file with no header""")
 parent_parser.add_argument("-s", "--sql-file",
                            help="""load query in a SQL file, overrides
-                                   sql_query arguments for the 'unload',
-                                   'query' and 'exe' sub-commands""")
+                                   sql_query arguments for the 'export',
+                                   'query' and 'exec' sub-commands""")
 
 # Verbose and Quiet Group
 group_v_q = parent_parser.add_mutually_exclusive_group()
@@ -281,16 +293,29 @@ parser = argparse.ArgumentParser(prog="csvql", parents=[parent_parser])
 
 # Version
 parser.add_argument("--version", action="version",
-                    version="%(prog)s version 0.0.1",
+                    version="%(prog)s version 0.0.4",
                     help="""print version number on screen and exit""")
 
 subparsers = parser.add_subparsers(help="""sub-command help""")
 
-# Exe sub-command
-parser_exe = subparsers.add_parser("exe",
+# Exec sub-command
+parser_exec = subparsers.add_parser("exec",
                                    help="""execute an given SQL statement""")
-parser_exe.add_argument("sql_query", help="""SQL statement""")
-parser_exe.set_defaults(func=exe)
+parser_exec.add_argument("sql_query", help="""SQL statement""")
+parser_exec.set_defaults(func=_exec)
+
+# Export sub-command
+parser_export = subparsers.add_parser("export",
+                                      help="""write a file with the
+                                              content of a query result""")
+parser_export.add_argument("file_name",
+                           help="""file to write""")
+parser_export.add_argument("sql_query",
+                           help="""select SQL statement""")
+parser_export.add_argument("-f", "--format", default="csv",
+                         help="""format of exported file, default is csv and
+                                 json is supported""")
+parser_export.set_defaults(func=_export)
 
 # Desc sub-command
 parser_desc = subparsers.add_parser("desc",
@@ -298,7 +323,7 @@ parser_desc = subparsers.add_parser("desc",
                                             the given table(s)""")
 parser_desc.add_argument("table_name", nargs='*',
                          help="""name(s) of the table(s) to be described""")
-parser_desc.set_defaults(func=desc)
+parser_desc.set_defaults(func=_desc)
 
 # Drop sub-command
 parser_drop = subparsers.add_parser("drop",
@@ -306,19 +331,19 @@ parser_drop = subparsers.add_parser("drop",
 parser_drop.add_argument("table_name", nargs='*',
                          help="""name(s) of the table(s) to
                                  be deleted""")
-parser_drop.set_defaults(func=drop)
+parser_drop.set_defaults(func=_drop)
 
-# Load sub-command
-parser_load = subparsers.add_parser("load",
-                                    help="""read a CSV file and load
+# Import sub-command
+parser_import = subparsers.add_parser("import",
+                                    help="""read a CSV file and import
                                             into the database""")
-parser_load.add_argument("file_name",
+parser_import.add_argument("file_name",
                          help="""CSV file to read""")
-parser_load.add_argument("table_name",
+parser_import.add_argument("table_name",
                          help="""name of the table to be created""")
-parser_load.set_defaults(func=load)
+parser_import.set_defaults(func=_import)
 
-parser_load.add_argument("-i", "--ignore", type=int, default=0,
+parser_import.add_argument("-i", "--ignore", type=int, default=0,
                          help="""ignore first n lines of the CSV file,
                                  default is 0""")
 
@@ -328,7 +353,7 @@ parser_query = subparsers.add_parser("query",
                                              result on the screen""")
 parser_query.add_argument("sql_query",
                           help="""select SQL statement""")
-parser_query.set_defaults(func=query)
+parser_query.set_defaults(func=_query)
 
 group_r_a = parser_query.add_mutually_exclusive_group()
 group_r_a.add_argument("-r", "--num-rows", type=int, default=10,
@@ -341,18 +366,11 @@ group_r_a.add_argument("-a", "--all", action="store_true",
 parser_tables = subparsers.add_parser("tables",
                                       help="""print the names of all
                                               tables""")
-parser_tables.set_defaults(func=tables)
-
-# Unload sub-command
-parser_unload = subparsers.add_parser("unload",
-                                      help="""write a CSV file with the
-                                              content of a query result""")
-parser_unload.add_argument("file_name",
-                           help="""CSV file to write""")
-parser_unload.add_argument("sql_query",
-                           help="""select SQL statement""")
-parser_unload.set_defaults(func=unload)
+parser_tables.set_defaults(func=_tables)
 
 # Parse args and run function
 args = parser.parse_args()
 args.func(args)
+
+def main():
+    None

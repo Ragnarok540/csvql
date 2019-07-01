@@ -293,7 +293,7 @@ parser = argparse.ArgumentParser(prog="csvql", parents=[parent_parser])
 
 # Version
 parser.add_argument("--version", action="version",
-                    version="%(prog)s version 0.0.4",
+                    version="%(prog)s version 0.0.5",
                     help="""print version number on screen and exit""")
 
 subparsers = parser.add_subparsers(help="""sub-command help""")

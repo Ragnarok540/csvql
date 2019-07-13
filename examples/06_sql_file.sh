@@ -1,5 +1,5 @@
 #!/bin/bash
-# two or more CSV files example
+# SQL file query example
 
 # Read files and import data into tables
 csvql --verbose import shops.csv shop
@@ -12,13 +12,7 @@ csvql tables
 csvql desc shop product
 
 # Query and show results
-csvql query "select s.name as shop,
-                    p.name as product,
-                    p.price
-               from shop s,
-                    product p
-              where s.id = p.shop_id
-           order by p.price desc"
+csvql --sql-file query_count.sql query ""
 
 # Drop tables
 csvql drop shop product

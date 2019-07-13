@@ -192,13 +192,19 @@ def _exec(args):
 
 def _export(args):
     db = DB(args.connect)
+    if args.verbose:
+        print(f"connected to '{args.connect}'...")
     sql = args.sql_query
     if args.sql_file:
         sql = db.read_sql(args.sql_file)
-    print(f"executing: '{sql}'") if args.verbose else None
+    print(f"executing: '{sql}'...") if args.verbose else None
     result = db.query_db(sql)
     db.close()
     if args.format == "csv":
+        if args.verbose:
+            print(f"using delimiter: '{args.delimiter}'...")
+            if args.header:
+                print(f"generating header...")
         csvrw = CSVRW(args.file_name, args.delimiter)
         csvrw.write(result, args.header)
     elif args.format == "json":
@@ -208,8 +214,8 @@ def _export(args):
         with open(args.file_name, 'w') as json_file:
             json.dump(list, json_file, indent=2)
     if args.verbose:
-        print(f"'{args.file_name}' created")
-        print(f"'{len(result)}' rows written")
+        print(f"{args.file_name} created")
+        print(f"{len(result)} rows written")
 
 
 def _desc(args):
@@ -223,13 +229,20 @@ def _drop(args):
     db = DB(args.connect)
     for table in args.table_name:
         db.drop_table(table)
-        print(f"{table} dropped") if args.verbose else None
+        print(f"{table} dropped") if not args.quiet else None
     db.close()
 
 
 def _import(args):
+    if args.verbose:
+        print(f"connected to {args.connect}...")
+        print(f"reading {args.file_name}...")
+        print(f"using delimiter '{args.delimiter}'...")
+        if args.header:
+            print(f"generating header...")
+        if args.ignore > 0:
+            print(f"ignoring first {args.ignore} rows...")
     csvrw = CSVRW(args.file_name, args.delimiter)
-    print(f"reading '{args.file_name}'") if args.verbose else None
     csv = csvrw.read(args.ignore)
     db = DB(args.connect)
     columns = db.columns(csv, args.header)
@@ -238,7 +251,7 @@ def _import(args):
     db.bulk_insert(args.table_name, csv, args.header)
     db.close()
     if not args.quiet:
-        print(f"""{len(csv)} rows inserted into {args.table_name}""")
+        print(f"{len(csv)} rows inserted into {args.table_name}")
 
 
 def _query(args):
@@ -246,18 +259,19 @@ def _query(args):
     sql = args.sql_query
     if args.sql_file:
         sql = db.read_sql(args.sql_file)
-    print(f"executing: '{sql}'\n") if args.verbose else None
+    print(f"executing: '{sql}'") if args.verbose else None
     result = db.query_db(sql)
     if args.all:
         db.print_table(result, header=args.header)
-        print(f"\n{len(result)} rows in result") if not args.quiet else None
+        print(f"{len(result)} rows in result") if not args.quiet else None
     else:
         db.print_table(result,
                        header=args.header,
                        maxr=args.num_rows)
         if not args.quiet:
-            print(f"""\n{len(result)} rows in result,""")
-            print(f"""{args.num_rows} or less shown""")
+            print(f"""{len(result)} rows in result""")
+            if len(result) > args.num_rows:
+                print(f"""{args.num_rows} rows shown""")
     db.close()
 
 

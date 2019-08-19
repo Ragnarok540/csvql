@@ -1,6 +1,6 @@
 import argparse
 import json
-from lib import CSVRW, DB
+from src import CSVRW, DB
 
 
 def _exec(args):

@@ -1,5 +1,4 @@
 from csv import reader, writer
-from os.path import join, dirname, realpath
 
 def read(path, delim=',', ignore=0):
     result = []

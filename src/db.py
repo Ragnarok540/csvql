@@ -1,6 +1,26 @@
 import sqlite3
 import sys
 
+def _db_connect(path):
+    db = sqlite3.connect(path)
+    db.row_factory = sqlite3.Row
+    return db
+
+def query_db(path, query, args=(), one=False):
+    db = _db_connect(path)
+    cur = db.cursor()
+    cur.execute(query, args)
+    db.commit()
+    rv = cur.fetchall()
+    cur.close()
+    db.close()
+    return (rv[0] if rv else None) if one else rv
+
+def read_sql(path):
+    result = ''
+    with open(path) as file:
+        result = file.read()
+    return result
 
 class DB:
     def __init__(self, path):

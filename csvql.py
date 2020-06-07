@@ -1,34 +1,23 @@
 import argparse
 import json
-from src.db import DB
+from src.db import DB, query_db, read_sql
 from src.csvrw import read, write
 
 def _exec(args):
-    db = DB(args.connect)
     sql = args.sql_query
     if args.sql_file:
-        sql = db.read_sql(args.sql_file)
+        sql = read_sql(args.sql_file)
     print(f"executing: '{sql}'") if args.verbose else None
-    db.query_db(sql)
-    db.close()
-
+    return query_db(args.connect, sql)
 
 def _export(args):
-    db = DB(args.connect)
-    if args.verbose:
-        print(f"connected to '{args.connect}'...")
-    sql = args.sql_query
-    if args.sql_file:
-        sql = db.read_sql(args.sql_file)
-    print(f"executing: '{sql}'...") if args.verbose else None
-    result = db.query_db(sql)
-    db.close()
+    result = _exec(args)
+
     if args.format == "csv":
         if args.verbose:
             print(f"using delimiter: '{args.delimiter}'...")
             if args.header:
                 print(f"generating header...")
-        #csvrw = CSVRW(args.file_name, args.delimiter)
         write(args.file_name, result, args.delimiter, args.header)
     elif args.format == "json":
         list = []
@@ -65,7 +54,6 @@ def _import(args):
             print(f"generating header...")
         if args.ignore > 0:
             print(f"ignoring first {args.ignore} rows...")
-    #csvrw = CSVRW(args.file_name, args.delimiter)
     csv = read(args.file_name, args.delimiter, args.ignore)
     db = DB(args.connect)
     columns = db.columns(csv, args.header)

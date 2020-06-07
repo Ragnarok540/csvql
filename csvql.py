@@ -1,7 +1,8 @@
 import argparse
 import json
-from src.db import DB, query_db, read_sql
+from src.db import query_db, read_sql, drop_table, table_sql, tables
 from src.csvrw import read, write
+from src.table import print_table, bulk_insert, create_table
 
 def _exec(args):
     sql = args.sql_query
@@ -29,21 +30,14 @@ def _export(args):
         print(f"{args.file_name} created")
         print(f"{len(result)} rows written")
 
-
 def _desc(args):
-    db = DB(args.connect)
     for table in args.table_name:
-        db.print_sql(table)
-    db.close()
-
+        print(table_sql(args.connect, table))
 
 def _drop(args):
-    db = DB(args.connect)
     for table in args.table_name:
-        db.drop_table(table)
+        drop_table(args.connect, table)
         print(f"{table} dropped") if not args.quiet else None
-    db.close()
-
 
 def _import(args):
     if args.verbose:
@@ -55,42 +49,29 @@ def _import(args):
         if args.ignore > 0:
             print(f"ignoring first {args.ignore} rows...")
     csv = read(args.file_name, args.delimiter, args.ignore)
-    db = DB(args.connect)
-    columns = db.columns(csv, args.header)
-    types = db.types(csv, args.header)
-    db.create_table(args.table_name, columns, types)
-    db.bulk_insert(args.table_name, csv, args.header)
-    db.close()
+    args.sql_query = create_table(csv, args.header)
+    _exec(args)
+    args.sql_query = bulk_insert(args.table_name, csv, args.header)
+    _exec(args)
     if not args.quiet:
         print(f"{len(csv)} rows inserted into {args.table_name}")
 
-
 def _query(args):
-    db = DB(args.connect)
-    sql = args.sql_query
-    if args.sql_file:
-        sql = db.read_sql(args.sql_file)
-    print(f"executing: '{sql}'") if args.verbose else None
-    result = db.query_db(sql)
+    result = _exec(args)
+
     if args.all:
-        db.print_table(result, header=args.header)
+        print_table(result, header=args.header)
         print(f"{len(result)} rows in result") if not args.quiet else None
     else:
-        db.print_table(result,
-                       header=args.header,
-                       maxr=args.num_rows)
+        print_table(result, header=args.header, maxr=args.num_rows)
         if not args.quiet:
             print(f"""{len(result)} rows in result""")
             if len(result) > args.num_rows:
                 print(f"""{args.num_rows} rows shown""")
-    db.close()
-
 
 def _tables(args):
-    db = DB(args.connect)
-    db.print_tables()
-    db.close()
-
+    print(tables(args.connect))
+    
 def main():
     parent_parser = argparse.ArgumentParser(add_help=False)
 

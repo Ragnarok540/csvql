@@ -1,27 +1,22 @@
-import csv
+from csv import reader, writer
+from os.path import join, dirname, realpath
 
+def read(path, delim=',', ignore=0):
+    result = []
+    with open(path, newline='') as csv_file:
+        csv_reader = reader(csv_file, delimiter=delim)
+        counter = 0
+        for row in csv_reader:
+            if counter < ignore:
+                counter = counter + 1
+                continue
+            result.append(row)
+    return result
 
-class CSVRW:
-    def __init__(self, path, delimiter):
-        self.path = path
-        self.delimiter = delimiter
-
-    def read(self, ignore=0):
-        ls = []
-        with open(self.path, newline='') as csvfile:
-            reader = csv.reader(csvfile, delimiter=self.delimiter)
-            counter = 0
-            for row in reader:
-                if counter < ignore:
-                    counter = counter + 1
-                    continue
-                ls.append(row)
-        return ls
-
-    def write(self, table, header=True):
-        with open(self.path, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=self.delimiter)
-            if header:
-                writer.writerow(table[0].keys())
-            for row in table:
-                writer.writerow(row)
+def write(path, table, delim=',', header=True):
+    with open(path, mode='w', newline='') as csv_file:
+        csv_writer = writer(csv_file, delimiter=delim)
+        if header:
+            csv_writer.writerow(table[0].keys())
+        for row in table:
+            csv_writer.writerow(row)

@@ -1,5 +1,5 @@
 import sqlite3
-import sys
+
 
 def query_db(path, query, args=(), one=False):
     db = sqlite3.connect(path)
@@ -12,15 +12,18 @@ def query_db(path, query, args=(), one=False):
     db.close()
     return (rv[0] if rv else None) if one else rv
 
+
 def read_sql(path):
     result = ''
     with open(path) as file:
         result = file.read()
     return result
 
+
 def drop_table(path, name):
     sql = f"DROP TABLE IF EXISTS {name}"
     query_db(path, sql)
+
 
 def table_sql(path, name):
     sql = """
@@ -30,6 +33,7 @@ def table_sql(path, name):
           """
     result = query_db(path, sql, args=(name,), one=True)
     return list(result)[0]
+
 
 def tables(path):
     sql = """

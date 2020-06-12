@@ -1,5 +1,6 @@
 from csv import reader, writer
 
+
 def read(path, delim=',', ignore=0):
     result = []
     with open(path, newline='') as csv_file:
@@ -11,6 +12,7 @@ def read(path, delim=',', ignore=0):
                 continue
             result.append(row)
     return result
+
 
 def write(path, table, delim=',', header=True):
     with open(path, mode='w', newline='') as csv_file:

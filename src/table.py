@@ -1,5 +1,6 @@
 import sys
 
+
 def type_value(value):
     if value == "":
         return "NULL"
@@ -12,6 +13,7 @@ def type_value(value):
             return "REAL"
         except ValueError:
             return "TEXT"
+
 
 def type_column(table, column):
     integer = False
@@ -33,6 +35,7 @@ def type_column(table, column):
         return "INTEGER"
     return "TEXT"
 
+
 def types(table, header=True):
     if header:
         table.pop(0)
@@ -41,32 +44,37 @@ def types(table, header=True):
         typs.append(type_column(table, column))
     return typs
 
-def columns(table, file_header=True):
+
+def columns(table, header=True):
     cols = []
-    header = table[0]
+    table_header = table[0]
     counter = 0
-    for column in header:
-        if file_header:
+    for column in table_header:
+        if header:
             cols.append(column)
         else:
             cols.append(f"col_{counter}")
             counter = counter + 1
     return cols
 
-def create_table(self, name, table, file_header=True):
+
+def create_table(name, table, header=True):
     statement = []
     statement.append("CREATE TABLE")
     statement.append(name)
     statement.append("(")
-    cols = columns(table, file_header)
-    typs = types(table, file_header)
+    cols = columns(table, header)
+    typs = types(table, header)
     col_types = list(zip(cols, typs))
     col_types = list(map(lambda x: " ".join(list(x)), col_types))
     statement.append(", ".join(col_types))
     statement.append(");")
     return " ".join(statement)
 
+
 def bulk_insert(name, table, header=True):
+    if header:
+        table.pop(0)
     statement = []
     statement.append("INSERT INTO")
     statement.append(name)
@@ -88,6 +96,7 @@ def bulk_insert(name, table, header=True):
         counter = counter + 1
     statement.append(";")
     return " ".join(statement)
+
 
 def print_table(table, header=True, maxr=sys.maxsize):
     if header:

@@ -35,6 +35,7 @@ See ``examples`` folder for common and advanced use cases
 # Related Projects
 
 - [q](https://github.com/harelba/q)
+- [textql](https://github.com/dinedal/textql)
 - [csv-sql](https://github.com/alex/csv-sql)
 - [qhs](https://github.com/itchyny/qhs)
 - [OpenCSV](https://github.com/hyee/OpenCSV)

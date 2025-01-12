@@ -9,7 +9,8 @@ def _exec(args):
     sql = args.sql_query
     if args.sql_file:
         sql = read_sql(args.sql_file)
-    print(f"executing: '{sql}'") if args.verbose else None
+    if args.verbose:
+        print(f"executing: '{sql}'")
     return query_db(args.connect, sql)
 
 
@@ -23,11 +24,11 @@ def _export(args):
                 print("generating header...")
         write(args.file_name, result, args.delimiter, args.header)
     elif args.format == "json":
-        list = []
+        li = []
         for item in result:
-            list.append(dict(zip(item.keys(), item)))
+            li.append(dict(zip(item.keys(), item)))
         with open(args.file_name, 'w') as json_file:
-            json.dump(list, json_file, indent=2)
+            json.dump(li, json_file, indent=2)
     if args.verbose:
         print(f"{args.file_name} created")
         print(f"{len(result)} rows written")
@@ -41,7 +42,8 @@ def _desc(args):
 def _drop(args):
     for table in args.table_name:
         drop_table(args.connect, table)
-        print(f"{table} dropped") if not args.quiet else None
+        if not args.quiet:
+            print(f"{table} dropped")
 
 
 def _import(args):
@@ -67,7 +69,8 @@ def _query(args):
 
     if args.all:
         print_table(result, header=args.header)
-        print(f"{len(result)} rows in result") if not args.quiet else None
+        if not args.quiet:
+            print(f"{len(result)} rows in result")
     else:
         print_table(result, header=args.header, maxr=args.num_rows)
         if not args.quiet:

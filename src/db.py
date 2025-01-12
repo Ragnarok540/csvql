@@ -1,7 +1,8 @@
 import sqlite3
+from typing import Tuple
 
 
-def query_db(path, query, args=(), one=False):
+def query_db(path: str, query: str, args: Tuple = (), one: bool = False):
     db = sqlite3.connect(path)
     db.row_factory = sqlite3.Row
     cur = db.cursor()
@@ -13,19 +14,19 @@ def query_db(path, query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 
-def read_sql(path):
+def read_sql(path: str):
     result = ''
     with open(path) as file:
         result = file.read()
     return result
 
 
-def drop_table(path, name):
+def drop_table(path: str, name: str) -> None:
     sql = f"DROP TABLE IF EXISTS {name}"
     query_db(path, sql)
 
 
-def table_sql(path, name):
+def table_sql(path: str, name: str):
     sql = """
           SELECT sql
             FROM sqlite_master
@@ -35,7 +36,7 @@ def table_sql(path, name):
     return list(result)[0]
 
 
-def tables(path):
+def tables(path: str) -> str:
     sql = """
           SELECT name
             FROM sqlite_master

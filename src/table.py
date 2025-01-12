@@ -1,7 +1,7 @@
 import sys
 
 
-def type_value(value):
+def type_value(value) -> str:
     if value == "":
         return "NULL"
     try:
@@ -15,7 +15,7 @@ def type_value(value):
             return "TEXT"
 
 
-def type_column(table, column):
+def type_column(table: list, column: int) -> str:
     integer = False
     real = False
     text = False
@@ -36,7 +36,7 @@ def type_column(table, column):
     return "TEXT"
 
 
-def types(table, header=True):
+def types(table: list, header: bool = True) -> list[str]:
     if header:
         table.pop(0)
     typs = []
@@ -45,7 +45,7 @@ def types(table, header=True):
     return typs
 
 
-def columns(table, header=True):
+def columns(table: list, header: bool = True):
     cols = []
     table_header = table[0]
     counter = 0
@@ -58,7 +58,7 @@ def columns(table, header=True):
     return cols
 
 
-def create_table(name, table, header=True):
+def create_table(name: str, table: list, header: bool = True):
     statement = []
     statement.append("CREATE TABLE")
     statement.append(name)
@@ -72,7 +72,7 @@ def create_table(name, table, header=True):
     return " ".join(statement)
 
 
-def bulk_insert(name, table, header=True):
+def bulk_insert(name: str, table: list, header: bool = True):
     if header:
         table.pop(0)
     statement = []
@@ -98,7 +98,7 @@ def bulk_insert(name, table, header=True):
     return " ".join(statement)
 
 
-def print_table(table, header=True, maxr=sys.maxsize):
+def print_table(table: list, header: bool = True, maxr: int = sys.maxsize):
     if header:
         try:
             print(table[0].keys())

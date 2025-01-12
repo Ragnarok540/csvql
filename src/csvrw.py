@@ -1,7 +1,7 @@
 from csv import reader, writer
 
 
-def read(path, delim=',', ignore=0):
+def read(path: str, delim: str = ',', ignore: int = 0) -> list:
     result = []
     with open(path, newline='') as csv_file:
         csv_reader = reader(csv_file, delimiter=delim)
@@ -14,7 +14,7 @@ def read(path, delim=',', ignore=0):
     return result
 
 
-def write(path, table, delim=',', header=True):
+def write(path: str, table: list, delim: str = ',', header: bool = True) -> None:
     with open(path, mode='w', newline='') as csv_file:
         csv_writer = writer(csv_file, delimiter=delim)
         if header:

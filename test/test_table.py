@@ -1,48 +1,53 @@
 import unittest
-from src.table import type_value, type_column, types, columns, create_table, bulk_insert
+from src.table import (type_value,
+                       type_column,
+                       types,
+                       columns,
+                       create_table,
+                       bulk_insert)
 
 
 class TableTest(unittest.TestCase):
 
     def setUp(self):
-        self.data = [["1",   "2",   "3", ""], 
-                     ["4", "5.5", "6.6", ""], 
+        self.data = [["1",   "2",   "3", ""],
+                     ["4", "5.5", "6.6", ""],
                      ["7",   "8",   "A", ""],
-                     [ "",    "",    "", ""]]
+                     ["",     "",    "", ""]]
 
-        self.data_h = [["a",  "bc", "1", "23"], 
+        self.data_h = [["a",  "bc", "1", "23"],
                        ["1", "5.5", "A",   ""]]
 
     def test_type_value(self):
         expected = "NULL"
         observed = type_value("")
         self.assertEqual(expected, observed)
-        
+
         expected = "INTEGER"
         observed = type_value("123")
         self.assertEqual(expected, observed)
-        
+
         expected = "REAL"
         observed = type_value("123.123")
         self.assertEqual(expected, observed)
-        
+
         expected = "TEXT"
         observed = type_value("HELLO")
         self.assertEqual(expected, observed)
-        
+
     def test_type_column(self):
         expected = "INTEGER"
         observed = type_column(self.data, 0)
         self.assertEqual(expected, observed)
-        
+
         expected = "REAL"
         observed = type_column(self.data, 1)
         self.assertEqual(expected, observed)
-        
+
         expected = "TEXT"
         observed = type_column(self.data, 2)
         self.assertEqual(expected, observed)
-        
+
         expected = "TEXT"
         observed = type_column(self.data, 3)
         self.assertEqual(expected, observed)

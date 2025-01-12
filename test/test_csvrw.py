@@ -3,17 +3,23 @@ import sqlite3
 from os import unlink
 from os.path import join, dirname, realpath, isfile
 from src.csvrw import read, write
-from src.db import query_db
 
 
 class CSVRWTest(unittest.TestCase):
 
     def setUp(self):
-        self.expected = [['test1', 'test2', 'test3'], ['1', '2', '3'], ['4', '5', '6']]
-        self.read_path = join(dirname(realpath(__file__)), 'csv/read.csv')
-        self.read_delim_path = join(dirname(realpath(__file__)), 'csv/read_delim.csv')
-        self.read_ignore_path = join(dirname(realpath(__file__)), 'csv/read_ignore.csv')
-        self.write_path = join(dirname(realpath(__file__)), 'csv/write.csv')
+        self.expected = [
+            ['test1', 'test2', 'test3'],
+            ['1', '2', '3'],
+            ['4', '5', '6']]
+        self.read_path = join(dirname(realpath(__file__)),
+                              'csv/read.csv')
+        self.read_delim_path = join(dirname(realpath(__file__)),
+                                    'csv/read_delim.csv')
+        self.read_ignore_path = join(dirname(realpath(__file__)),
+                                     'csv/read_ignore.csv')
+        self.write_path = join(dirname(realpath(__file__)),
+                               'csv/write.csv')
 
     def tearDown(self):
         if isfile(self.write_path):

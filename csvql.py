@@ -27,7 +27,7 @@ def _export(args):
         li = []
         for item in result:
             li.append(dict(zip(item.keys(), item)))
-        with open(args.file_name, 'w') as json_file:
+        with open(args.file_name, 'w', encoding="utf-8") as json_file:
             json.dump(li, json_file, indent=2)
     if args.verbose:
         print(f"{args.file_name} created")
@@ -56,7 +56,7 @@ def _import(args):
         if args.ignore > 0:
             print(f"ignoring first {args.ignore} rows...")
     csv = read(args.file_name, args.delimiter, args.ignore)
-    args.sql_query = create_table(csv, header=args.header)
+    args.sql_query = create_table(args.table_name, csv, header=args.header)
     _exec(args)
     args.sql_query = bulk_insert(args.table_name, csv, header=args.header)
     _exec(args)
@@ -131,14 +131,14 @@ def main():
     parser_export.add_argument("sql_query",
                                help="""select SQL statement""")
     parser_export.add_argument("-f", "--format", default="csv",
-                               help="""format of exported file, default is csv and
-                                    json is supported""")
+                               help="""format of exported file, default is csv
+                                    and json is supported""")
     parser_export.set_defaults(func=_export)
 
     # Desc sub-command
     parser_desc = subparsers.add_parser("desc",
-                                        help="""print the SQL create statement of
-                                                the given table(s)""")
+                                        help="""print the SQL create statement
+                                             of the given table(s)""")
     parser_desc.add_argument("table_name", nargs='*',
                              help="""name(s) of the table(s) to be
                                   described""")

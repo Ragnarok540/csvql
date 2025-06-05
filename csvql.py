@@ -1,3 +1,5 @@
+"""main module of the csvql app"""
+
 import argparse
 import json
 from src.db import query_db, read_sql, drop_table, table_sql, tables
@@ -84,6 +86,7 @@ def _tables(args):
 
 
 def main():
+    """function for the CLI interface"""
     parent_parser = argparse.ArgumentParser(add_help=False)
 
     # Option Commands

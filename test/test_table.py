@@ -71,16 +71,20 @@ class TableTest(unittest.TestCase):
         self.assertEqual(expected, observed)
 
     def test_create_table(self):
-        expected = "CREATE TABLE data ( col_0 INTEGER, col_1 REAL, col_2 TEXT, col_3 TEXT );"
+        expected = ("CREATE TABLE data ( col_0 INTEGER, col_1 REAL, "
+                    "col_2 TEXT, col_3 TEXT );")
         observed = create_table("data", self.data, header=False)
         self.assertEqual(expected, observed)
 
-        expected = "CREATE TABLE data_h ( a INTEGER, bc REAL, 1 TEXT, 23 TEXT );"
+        expected = ("CREATE TABLE data_h ( a INTEGER, bc REAL, 1 TEXT, "
+                    "23 TEXT );")
         observed = create_table("data_h", self.data_h)
         self.assertEqual(expected, observed)
 
     def test_bulk_insert(self):
-        expected = "INSERT INTO data VALUES ( '1' , '2' , '3' , NULL ) , ( '4' , '5.5' , '6.6' , NULL ) , ( '7' , '8' , 'A' , NULL ) , ( NULL , NULL , NULL , NULL ) ;"
+        expected = ("INSERT INTO data VALUES ( '1' , '2' , '3' , NULL ) "
+                    ", ( '4' , '5.5' , '6.6' , NULL ) , ( '7' , '8' , "
+                    "'A' , NULL ) , ( NULL , NULL , NULL , NULL ) ;")
         observed = bulk_insert("data", self.data, header=False)
         self.assertEqual(expected, observed)
 
